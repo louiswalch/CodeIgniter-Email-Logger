@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * in 'log' as the protocol or the perferred way would be to add the 
  * following record to your email config file (config/email.php):
  *  
- *    $config['force_log_protocol'] = true;
+ *    $config['force_email_logging'] = true;
  *
  * TIP: Add an environment-specific config file to automatically control.
  * https://www.codeigniter.com/userguide3/libraries/config.html#environments
@@ -89,39 +89,20 @@ class MY_Email extends CI_Email {
      * @return  bool
      */
     protected function _spool_email() {
+        
+        // If we are not logging, continue as if nothing ever happened.
+        if (!$this->_force_logging) return parent::_spool_email();
 
-        if ($this->_force_logging) {
-
-            $this->_send_to_log();
-
-        } else {
-
-            // Continue as if nothing ever happened.
-            return parent::_spool_email();
-
-        }
-
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Send to log
-     *
-     * @return  bool
-     */
-    protected function _send_to_log() {
-
-        log_message('debug', '====== SENGING MAIL ===================================================');
-
+        // Otherwise write the mail request to CodeIgnter logs.
+        log_message('debug', '====== MAIL LOGGER : Start ===================================================');
         log_message('debug', 'To: ' . implode(', ', $this->_recipients));
         log_message('debug', 'Subject: ' . $this->_raw_subject);
         log_message('debug', $this->_body);
-
-        log_message('debug', '=======================================================================');
+        log_message('debug', '====== MAIL LOGGER : End =====================================================');
 
         return TRUE;
 
     }
+
 
 }
